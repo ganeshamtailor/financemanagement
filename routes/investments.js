@@ -1,5 +1,6 @@
-const { getAllInvestments, createInvestment, updateInvestment, deleteInvestment} = require('../controllers/investment');
 const router = require('express').Router();
+const { getAllInvestments, createInvestment, updateInvestment, deleteInvestment} = require('../controllers/investment');
+
 
 router.get('/', getAllInvestments);
 router.post('/', createInvestment);
