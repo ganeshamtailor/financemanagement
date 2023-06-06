@@ -6,4 +6,5 @@ module.exports=function(app){
     app.use("/budgets",require("./budgets"))
     app.use("/savings",require("./savings"))
     app.use("/investments",require("./investments"))
+    app.use("/taxes",require("./taxes"))
 }
