@@ -2,8 +2,8 @@ const IncomeSchema= require("../models/income")
 
 
 exports.addIncome = async (req, res) => {
-    const {title, amount, category, description, date, userId}  = req.body
-
+    const {title, amount, category, description, date}  = req.body
+    const userId = req.user.id;
     const income = IncomeSchema({
         title,
         amount,
@@ -12,8 +12,7 @@ exports.addIncome = async (req, res) => {
         date,
         userId
     })
-    let result = req.user
-    console.log("req.user.userId", result);
+
     try {
         //validations
         if(!title || !category || !description || !date){
@@ -31,9 +30,24 @@ exports.addIncome = async (req, res) => {
 
 }
 
-exports.getIncomes = async (req, res) =>{
+exports.getIncome = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
     try {
-        const incomes = await IncomeSchema.find().sort({createdAt: -1})
+      const income = await IncomeSchema.findOne({ _id: id, userId })
+      if (!income) {
+        return res.status(404).json({ message: 'Income not found' });
+      }
+      res.status(200).json(income);
+    } catch (error) {
+      res.status(422).json({ message: 'Something went wrong' });
+    }
+  };
+
+exports.getIncomes = async (req, res) =>{
+    const userId = req.user.id;
+    try {
+        const incomes = await IncomeSchema.find({ userId }).sort({createdAt: -1})
         res.status(200).json(incomes)
     } catch (error) {
         res.status(422).json({message: 'Something went wrong'})
@@ -42,11 +56,14 @@ exports.getIncomes = async (req, res) =>{
 
 exports.deleteIncome = async (req, res) =>{
     const {id} = req.params;
-    IncomeSchema.findByIdAndDelete(id)
-        .then((income) =>{
-            res.status(200).json({message: 'Income Deleted'})
-        })
-        .catch((err) =>{
-            res.status(422).json({message: 'Somthing went wrong'})
-        })
-}
+    const userId = req.user.id;
+    try {
+        const deletedIncome = await IncomeSchema.findOneAndDelete({ _id: id, userId });
+        if (!deletedIncome) {
+          return res.status(404).json({ message: 'Income not found' });
+        }
+        res.status(200).json({ message: 'Income Deleted' });
+      } catch (error) {
+        res.status(422).json({ message: 'Something went wrong' });
+      }
+};

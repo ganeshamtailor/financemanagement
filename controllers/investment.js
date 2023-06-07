@@ -1,5 +1,20 @@
 const Investment = require('../models/investment');
 
+exports.getInvestment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const investment = await Investment.findById(id);
+    if (!investment) {
+      return res.status(404).json({ message: 'Investment not found' });
+    }
+
+    res.json(investment);
+  } catch (error) {
+    res.status(422).json({ message: error.message });
+  }
+};
+
 exports.getAllInvestments = async (req, res) => {
   try {
     const investments = await Investment.find();
@@ -67,6 +82,6 @@ exports.deleteInvestment = async (req, res) => {
     await investment.deleteOne();
     res.json({ message: 'Investment deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(422).json({ message: error.message });
   }
 };
