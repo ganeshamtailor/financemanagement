@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const { getAllInvestments, createInvestment, updateInvestment, deleteInvestment} = require('../controllers/investment');
+const { verifyUser } = require('../middleware/verifyToken')
 
-
-router.get('/', getAllInvestments);
-router.post('/', createInvestment);
-router.put('/:id', updateInvestment);
-router.delete('/:id', deleteInvestment);
+router.get('/', verifyUser, getAllInvestments);
+router.post('/', verifyUser, createInvestment);
+router.put('/:id', verifyUser, updateInvestment);
+router.delete('/:id', verifyUser, deleteInvestment);
 
 module.exports = router;

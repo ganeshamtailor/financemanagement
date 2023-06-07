@@ -10,12 +10,12 @@ exports.getAllTaxes = async (req, res) => {
 };
 
 exports.createTax = async (req, res) => {
-  const { userId, name, amount, description } = req.body;
+  const { userId, title, amount, description } = req.body;
 
   try {
     const tax = new Tax({
       userId,
-      name,
+      title,
       amount,
       description,
     });
@@ -30,14 +30,14 @@ exports.createTax = async (req, res) => {
 exports.updateTax = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, amount, description } = req.body;
+    const { title, amount, description } = req.body;
 
     const tax = await Tax.findById(id);
     if (!tax) {
       return res.status(404).json({ message: 'Tax not found' });
     }
 
-    tax.name = name;
+    tax.title = title;
     tax.amount = amount;
     tax.description = description;
 

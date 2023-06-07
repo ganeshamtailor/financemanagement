@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-exports.verifyToken = (req,res,next)=>{
+const verifyToken = (req,res,next)=>{
     const token = req.cookies.accessToken
 
     if(!token){
@@ -17,9 +17,9 @@ exports.verifyToken = (req,res,next)=>{
     })
 }
 
-exports.verifyUser = (req, res,next)=>{
+const verifyUser = (req, res,next)=>{
     verifyToken(req,res,next,()=>{
-        if(req.user.id === req.params.id || req.user.role === 'admin'){
+        if(req.user.id === req.params.id || req.user.role === 'user'){
             next()
         } else{
             return res.status(401).json({sucess:false, message:"You're not authenticated"})
@@ -27,7 +27,7 @@ exports.verifyUser = (req, res,next)=>{
     })
 }
 
-exports.verifyAdmin = (req, res,next)=>{
+const verifyAdmin = (req, res,next)=>{
     verifyToken(req,res,next,()=>{
         if(req.user.role === 'admin'){
             next()
@@ -36,3 +36,8 @@ exports.verifyAdmin = (req, res,next)=>{
         }
     })
 }
+module.exports = {
+    verifyToken,
+    verifyUser,
+    verifyAdmin
+  };

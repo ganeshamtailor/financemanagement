@@ -2,16 +2,18 @@ const IncomeSchema= require("../models/income")
 
 
 exports.addIncome = async (req, res) => {
-    const {title, amount, category, description, date}  = req.body
+    const {title, amount, category, description, date, userId}  = req.body
 
     const income = IncomeSchema({
         title,
         amount,
         category,
         description,
-        date
+        date,
+        userId
     })
-
+    let result = req.user
+    console.log("req.user.userId", result);
     try {
         //validations
         if(!title || !category || !description || !date){
@@ -23,10 +25,10 @@ exports.addIncome = async (req, res) => {
         await income.save()
         res.status(200).json({message: 'Income Added'})
     } catch (error) {
-        res.status(422).json({message: 'Something went wrong'})
+        res.status(422).json({message: error.message})
     }
 
-    console.log(income)
+
 }
 
 exports.getIncomes = async (req, res) =>{
