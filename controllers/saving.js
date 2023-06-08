@@ -2,7 +2,8 @@ const Savings = require('../models/saving');
 
 exports.getAllSavings = async (req, res) => {
   try {
-    const savings = await Savings.find();
+    const userId = req.user.id;
+    const savings = await Savings.find({userId});
     res.json(savings);
   } catch (error) {
     res.status(422).json({ message: error.message });
@@ -10,14 +11,14 @@ exports.getAllSavings = async (req, res) => {
 };
 
 exports.createSavings = async (req, res) => {
-  const { userId, amount, description, type } = req.body;
-
+  const { type, amount, description } = req.body;
+  const userId = req.user.id;
   try {
     const savings = new Savings({
-      userId,
       type,
       amount,
       description,
+      userId
     });
 
     const newSavings = await savings.save();
@@ -31,17 +32,16 @@ exports.createSavings = async (req, res) => {
 exports.updateSavings = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, amount, description, type } = req.body;
-
-    const savings = await Savings.findById(id);
+    const { amount, description, type } = req.body;
+    const userId = req.user.id;
+    const savings = await Savings.findOne({ _id: id, userId });
     if (!savings) {
       return res.status(404).json({ message: 'Savings not found' });
     }
-
-    savings.userId = userId;
+    savings.type = type;
     savings.amount = amount;
     savings.description = description;
-    savings.type = type;
+    
 
     const updatedSavings = await savings.save();
     res.json(updatedSavings);
@@ -53,8 +53,8 @@ exports.updateSavings = async (req, res) => {
 exports.deleteSavings = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const savings = await Savings.findById(id);
+    const userId = req.user.id;
+    const savings = await Savings.findOne({ _id: id, userId });
     if (!savings) {
       return res.status(404).json({ message: 'Savings not found' });
     }

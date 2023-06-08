@@ -2,8 +2,9 @@ const Budget = require('../models/budget');
 
 // Get all budgets
 exports.getAllBudgets = async (req, res) => {
+  const userId = req.user.id;
   try {
-    const budgets = await Budget.find();
+    const budgets = await Budget.find({ userId });
     res.json(budgets);
   } catch (error) {
     res.status(422).json({ message: 'Somthing went wrong' });
@@ -13,13 +14,14 @@ exports.getAllBudgets = async (req, res) => {
 // Create a new budget
 exports.createBudget = async (req, res) => {
   const { category, amount, startDate, endDate } = req.body;
-
+  const userId = req.user.id;
   try {
     const budget = new Budget({
       category,
       amount,
       startDate,
       endDate,
+      userId
     });
 
     const newBudget = await budget.save();
@@ -34,8 +36,8 @@ exports.updateBudget = async (req, res) => {
   try {
     const { id } = req.params;
     const { category, amount, startDate, endDate } = req.body;
-
-    const budget = await Budget.findById(id);
+    const userId = req.user.id;
+    const budget = await Budget.findOne({ _id: id, userId });
     if (!budget) {
       return res.status(404).json({ message: 'Budget not found' });
     }
@@ -56,8 +58,8 @@ exports.updateBudget = async (req, res) => {
 exports.deleteBudget = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const budget = await Budget.findById(id);
+    const userId = req.user.id;
+    const budget = await Budget.findOne({ _id: id, userId });
     if (!budget) {
       return res.status(404).json({ message: 'Budget not found' });
     }
