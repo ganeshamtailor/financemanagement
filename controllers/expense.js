@@ -28,9 +28,25 @@ exports.addExpense = async (req, res) => {
     }
 }
 
-exports.getExpenses = async (req, res) =>{
+exports.getExpense = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+  
     try {
-        const incomes = await ExpenseSchema.find().sort({createdAt: -1})
+      const expense = await ExpenseSchema.findOne({ _id: id, userId });
+      if (!expense) {
+        return res.status(404).json({ message: 'Expense not found' });
+      }
+      res.status(200).json(expense);
+    } catch (error) {
+      res.status(422).json({ message: error.message });
+    }
+  };
+
+exports.getExpenses = async (req, res) =>{
+    const userId = req.user.id;
+    try {
+        const incomes = await ExpenseSchema.find({ userId }).sort({createdAt: -1})
         res.status(200).json(incomes)
     } catch (error) {
         res.status(422).json({message: err.message})
@@ -39,7 +55,8 @@ exports.getExpenses = async (req, res) =>{
 
 exports.deleteExpense = async (req, res) =>{
     const {id} = req.params;
-    ExpenseSchema.findByIdAndDelete(id)
+    const userId = req.user.id;
+    ExpenseSchema.findByIdAndDelete({ _id: id, userId })
         .then((income) =>{
             res.status(200).json({message: 'Expense Deleted'})
         })
