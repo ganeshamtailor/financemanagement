@@ -52,7 +52,7 @@ exports.updateInvestment = async (req, res) => {
     const { id } = req.params;
     const { name, amount, type, startDate, endDate, description } = req.body;
     const userId = req.user.id;
-    const investment = await Investment.findOne({ _id: id, userId });;
+    const investment = await Investment.findOne({ _id: id, userId });
     if (!investment) {
       return res.status(404).json({ message: 'Investment not found' });
     }

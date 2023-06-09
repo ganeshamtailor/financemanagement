@@ -2,7 +2,8 @@ const Tax = require('../models/tax');
 
 exports.getAllTaxes = async (req, res) => {
   try {
-    const taxes = await Tax.find().populate('userId');
+    const userId = req.user.id;
+    const taxes = await Tax.find({userId});
     res.json(taxes);
   } catch (error) {
     res.status(422).json({ message: 'Somthing went wrong' });
@@ -10,8 +11,8 @@ exports.getAllTaxes = async (req, res) => {
 };
 
 exports.createTax = async (req, res) => {
-  const { userId, title, amount, description } = req.body;
-
+  const { title, amount, description } = req.body;
+  const userId = req.user.id;
   try {
     const tax = new Tax({
       userId,
@@ -30,9 +31,9 @@ exports.createTax = async (req, res) => {
 exports.updateTax = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id;
     const { title, amount, description } = req.body;
-
-    const tax = await Tax.findById(id);
+    const tax = await Tax.findOne({ _id: id, userId });
     if (!tax) {
       return res.status(404).json({ message: 'Tax not found' });
     }
@@ -51,8 +52,8 @@ exports.updateTax = async (req, res) => {
 exports.deleteTax = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const tax = await Tax.findById(id);
+    const userId = req.user.id;
+    const tax = await Tax.findOne({ _id: id, userId });
     if (!tax) {
       return res.status(404).json({ message: 'Tax not found' });
     }
