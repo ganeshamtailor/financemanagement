@@ -83,3 +83,30 @@ exports.updateExpense = async (req, res) => {
     res.status(422).json({ message: error.message });
   }
 };
+
+exports.getMonthlyExpenses = async (req, res) => {
+  const userId = req.user.id;
+  const { year, month } = req.query;
+
+  // Validate year and month inputs
+  if (!year || !month) {
+    return res.status(400).json({ message: 'Year and month are required parameters' });
+  }
+
+  try {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
+
+    const expenses = await ExpenseSchema.find({
+      userId,
+      date: { $gte: startDate, $lte: endDate },
+    });
+
+    // Calculate the sum of the amount
+    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+    res.status(200).json({ expenses, totalAmount });
+  } catch (error) {
+    res.status(422).json({ message: error.message });
+  }
+};
