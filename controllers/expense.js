@@ -64,3 +64,22 @@ exports.deleteExpense = async (req, res) =>{
             res.status(422).json({message: err.message})
         })
 }
+exports.updateExpense = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const { title, amount, category, description, date } = req.body;
+
+  try {
+    const updatedExpense = await ExpenseSchema.findOneAndUpdate(
+      { _id: id, userId },
+      { title, amount, category, description, date },
+      { new: true }
+    );
+    if (!updatedExpense) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+    res.status(200).json({ message: "Expense Updated", expense: updatedExpense });
+  } catch (error) {
+    res.status(422).json({ message: error.message });
+  }
+};

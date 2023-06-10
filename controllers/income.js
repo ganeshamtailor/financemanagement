@@ -67,3 +67,21 @@ exports.deleteIncome = async (req, res) =>{
         res.status(422).json({ message: 'Something went wrong' });
       }
 };
+exports.updateIncome = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const { title, amount, category, description, date } = req.body;
+  try {
+    const updatedIncome = await IncomeSchema.findOneAndUpdate(
+      { _id: id, userId },
+      { title, amount, category, description, date },
+      { new: true }
+    );
+    if (!updatedIncome) {
+      return res.status(404).json({ message: "Income not found" });
+    }
+    res.status(200).json({ message: "Income Updated", income: updatedIncome });
+  } catch (error) {
+    res.status(422).json({ message: "Something went wrong" });
+  }
+};
